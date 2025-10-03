@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Random Path Grid — 21x4</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .cell {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .cell:hover {
+      transform: scale(1.05);
+    }
+    
+    .cell.path {
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
+    }
+    
+    .cell.start {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+      50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+    }
+    
+    .cell.finish {
+      animation: glow 2s infinite;
+    }
+    
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .glass-effect {
+      backdrop-filter: blur(10px);
+      background: rgba(15, 23, 42, 0.8);
+    }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#10b981',
+            secondary: '#06b6d4',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
+  
+  <!-- Header -->
+  <div class="container mx-auto px-4 py-6">
+    <div class="text-center mb-8">
+      <h1 class="text-5xl font-bold text-white mb-3 tracking-tight">
+        🎲 Random Path Generator
+      </h1>
+      <p class="text-slate-300 text-lg">Generate jalur acak dengan aturan ketat 21×4 grid</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-4 pb-10">
+    <div class="grid lg:grid-cols-2 gap-6">
+      
+      <!-- Left Panel - Controls & Grid -->
+      <div class="glass-effect rounded-2xl p-6 shadow-2xl border border-slate-700">
+        
+        <!-- Controls Section -->
+        <div class="mb-6">
+          <!-- Button Generate -->
+          <div class="mb-4">
+            <button id="gen" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200">
+              🎲 Generate
+            </button>
+          </div>
+          
+          <!-- Settings -->
+          <div class="space-y-3 bg-slate-800/50 rounded-lg p-4">
+            <label class="flex items-center gap-3 cursor-pointer group">
+              <input id="prefer-middle" type="checkbox" checked class="w-5 h-5 text-emerald-500 bg-slate-700 border-slate-600 rounded focus:ring-2 focus:ring-emerald-500 focus:ring-offset-0 cursor-pointer" />
+              <span class="text-slate-200 group-hover:text-white transition-colors">Prefer middle start (col 1-2)</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer group">
+              <input id="more-turns" type="checkbox" class="w-5 h-5 text-emerald-500 bg-slate-700 border-slate-600 rounded focus:ring-2 focus:ring-emerald-500 focus:ring-offset-0 cursor-pointer" />
+              <span class="text-slate-200 group-hover:text-white transition-colors">More turns (less straight)</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer group">
+              <input id="balanced" type="checkbox" checked class="w-5 h-5 text-emerald-500 bg-slate-700 border-slate-600 rounded focus:ring-2 focus:ring-emerald-500 focus:ring-offset-0 cursor-pointer" />
+              <span class="text-slate-200 group-hover:text-white transition-colors">Balanced distribution</span>
+            </label>
+          </div>
+        </div>
+        
+        <!-- Grid Section -->
+        <div class="mb-4">
+          <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+            <span class="text-2xl">🗺️</span> Grid Interaktif
+          </h2>
+          
+          <div class="bg-slate-800/50 rounded-xl p-5 overflow-x-auto">
+            <div class="flex gap-3 min-w-max">
+              <!-- Row Labels -->
+              <div id="labels" class="flex flex-col gap-2"></div>
+              <!-- Grid -->
+              <div id="grid" class="grid grid-cols-4 gap-2"></div>
+            </div>
+          </div>
+          
+          <!-- Hint -->
+          <div class="mt-4 text-sm text-slate-300 bg-slate-800/30 rounded-lg p-3">
+            💡 <span class="font-medium">Tip:</span> Klik sel untuk toggle manual. 
+            <span class="text-amber-400 font-semibold">Start 🟢</span> & 
+            <span class="text-red-400 font-semibold">Finish 🏁</span> otomatis ditandai.
+          </div>
+        </div>
+        
+        <!-- Stats -->
+        <div class="bg-gradient-to-r from-slate-800/70 to-slate-700/70 rounded-xl p-5 border border-slate-600">
+          <h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+            <span>📈</span> Statistik
+          </h3>
+          <div id="stats" class="space-y-2 text-sm"></div>
+        </div>
+      </div>
+      
+      <!-- Right Panel - Preview -->
+      <div class="glass-effect rounded-2xl p-6 shadow-2xl border border-slate-700">
+        <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+          <span class="text-2xl">📊</span> Preview & Output
+        </h2>
+        
+        <div class="bg-slate-900/70 rounded-xl p-5 border border-slate-700 overflow-hidden">
+          <pre id="preview" class="text-sm text-slate-200 leading-relaxed overflow-auto max-h-[600px] font-mono"></pre>
+        </div>
+        
+        <!-- Info Cards -->
+        <div class="mt-6 grid grid-cols-2 gap-4">
+          <div class="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 rounded-lg p-4">
+            <div class="text-emerald-300 text-sm font-medium mb-1">Grid Size</div>
+            <div class="text-white text-2xl font-bold">21 × 4</div>
+          </div>
+          <div class="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-lg p-4">
+            <div class="text-purple-300 text-sm font-medium mb-1">Max Move</div>
+            <div class="text-white text-2xl font-bold">±1 Col</div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const ROWS = 21, COLS = 4;
+    const gridEl = document.getElementById('grid');
+    const labelsEl = document.getElementById('labels');
+    const preview = document.getElementById('preview');
+    const statsEl = document.getElementById('stats');
+    const preferMiddle = document.getElementById('prefer-middle');
+    const moreTurns = document.getElementById('more-turns');
+    const balanced = document.getElementById('balanced');
+
+    let state = new Array(ROWS).fill(0).map(()=>new Array(COLS).fill(false));
+
+    function createUI(){
+      gridEl.innerHTML = '';
+      labelsEl.innerHTML = '';
+      for(let r=0;r<ROWS;r++){
+        const rowLabel = document.createElement('div');
+        rowLabel.className = 'w-10 h-16 flex items-center justify-center text-slate-400 font-semibold text-xs bg-slate-800/50 rounded-lg';
+        rowLabel.textContent = (r+1).toString().padStart(2,'0');
+        labelsEl.appendChild(rowLabel);
+
+        for(let c=0;c<COLS;c++){
+          const cell = document.createElement('div');
+          cell.className='cell w-16 h-16 flex items-center justify-center rounded-xl bg-slate-800/80 cursor-pointer border-2 border-transparent hover:border-slate-600 text-2xl select-none';
+          cell.dataset.r=r;
+          cell.dataset.c=c;
+          cell.addEventListener('click',()=>{
+            state[r][c]=!state[r][c]; 
+            render(); 
+            updatePreview();
+          });
+          gridEl.appendChild(cell);
+        }
+      }
+    }
+
+    function render(){
+      const cells = gridEl.querySelectorAll('.cell');
+      cells.forEach(el=>{
+        const r = +el.dataset.r, c = +el.dataset.c;
+        el.classList.toggle('path', !!state[r][c]);
+        el.textContent = state[r][c] ? '✅' : '';
+        el.classList.remove('start','finish');
+      });
+      
+      // mark start
+      for(let r=0;r<ROWS;r++){
+        for(let c=0;c<COLS;c++){
+          if(state[r][c]){
+            const idx = r*COLS + c;
+            const el = gridEl.children[idx];
+            el.classList.add('start');
+            el.style.outline = '3px solid #f59e0b';
+            el.style.outlineOffset = '2px';
+            el.textContent = '🟢';
+            r = ROWS; break;
+          }
+        }
+      }
+      
+      // mark finish
+      for(let r=ROWS-1;r>=0;r--){
+        for(let c=0;c<COLS;c++){
+          if(state[r][c]){ 
+            const idx = r*COLS + c; 
+            const el = gridEl.children[idx];
+            el.classList.add('finish');
+            el.style.outline = '3px solid #ef4444';
+            el.style.outlineOffset = '2px';
+            el.textContent = '🏁';
+            r=-1; break; 
+          }
+        }
+      }
+    }
+
+    function updatePreview(){
+      const lines = state.map((row, idx)=>{
+        const rowNum = (idx+1).toString().padStart(2,'0');
+        const cells = row.map(cell=>cell? '✅' : '❌').join(' ');
+        return `${rowNum}: ${cells}`;
+      });
+      preview.textContent = lines.join('\n');
+      
+      // Calculate stats
+      let totalCells = 0;
+      let turns = 0;
+      let straight = 0;
+      let lastCol = -1;
+      let colCounts = [0,0,0,0];
+      
+      for(let r=0;r<ROWS;r++){
+        for(let c=0;c<COLS;c++){
+          if(state[r][c]){
+            totalCells++;
+            colCounts[c]++;
+            if(lastCol !== -1){
+              if(c === lastCol) straight++;
+              else turns++;
+            }
+            lastCol = c;
+          }
+        }
+      }
+      
+      statsEl.innerHTML = `
+        <div class="flex justify-between items-center bg-slate-900/50 rounded-lg p-3">
+          <span class="text-slate-400">Total Cells:</span>
+          <span class="text-emerald-400 font-bold text-lg">${totalCells}/${ROWS}</span>
+        </div>
+        <div class="flex justify-between items-center bg-slate-900/50 rounded-lg p-3">
+          <span class="text-slate-400">Turns:</span>
+          <span class="text-cyan-400 font-bold text-lg">${turns}</span>
+        </div>
+        <div class="flex justify-between items-center bg-slate-900/50 rounded-lg p-3">
+          <span class="text-slate-400">Straight:</span>
+          <span class="text-purple-400 font-bold text-lg">${straight}</span>
+        </div>
+        <div class="bg-slate-900/50 rounded-lg p-3">
+          <div class="text-slate-400 mb-2">Distribution:</div>
+          <div class="grid grid-cols-4 gap-2 text-center text-xs">
+            <div class="bg-slate-800 rounded py-2">
+              <div class="text-slate-500">Col 0</div>
+              <div class="text-white font-bold text-lg">${colCounts[0]}</div>
+            </div>
+            <div class="bg-slate-800 rounded py-2">
+              <div class="text-slate-500">Col 1</div>
+              <div class="text-white font-bold text-lg">${colCounts[1]}</div>
+            </div>
+            <div class="bg-slate-800 rounded py-2">
+              <div class="text-slate-500">Col 2</div>
+              <div class="text-white font-bold text-lg">${colCounts[2]}</div>
+            </div>
+            <div class="bg-slate-800 rounded py-2">
+              <div class="text-slate-500">Col 3</div>
+              <div class="text-white font-bold text-lg">${colCounts[3]}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function generate(){
+      state = new Array(ROWS).fill(0).map(()=>new Array(COLS).fill(false));
+      
+      const prefer = preferMiddle.checked;
+      const turns = moreTurns.checked;
+      const bal = balanced.checked;
+      
+      let cur = prefer ? (Math.random()<0.5?1:2) : Math.floor(Math.random()*COLS);
+      cur = clamp(cur,0,COLS-1);
+      
+      let lastMove = 0;
+      let zigzagCount = 0;
+      let straightCount = 0;
+      let colUsage = [0,0,0,0];
+      
+      for(let i=0; i<ROWS; i++){
+        state[i][cur] = true;
+        colUsage[cur]++;
+        
+        if(i === ROWS-1) break;
+        
+        let possibleMoves = [];
+        if(cur > 0) possibleMoves.push(-1);
+        possibleMoves.push(0);
+        if(cur < COLS-1) possibleMoves.push(1);
+        
+        let weights = [];
+        
+        for(let move of possibleMoves){
+          let weight = 1.0;
+          weight *= (0.5 + Math.random() * 1.5);
+          
+          if(lastMove !== 0 && move !== 0 && move === -lastMove){
+            weight *= 0.15;
+            zigzagCount++;
+          }
+          
+          if(turns){
+            if(move !== 0) weight *= 1.8;
+            if(move === 0 && straightCount > 2) weight *= 0.3;
+          } else {
+            if(move === 0 && straightCount < 4) weight *= 1.5;
+          }
+          
+          if(bal){
+            const targetCol = cur + move;
+            const avgUsage = (i+1) / COLS;
+            if(colUsage[targetCol] < avgUsage) weight *= 1.4;
+            if(colUsage[targetCol] > avgUsage * 1.5) weight *= 0.5;
+          }
+          
+          if((cur === 0 && move === 0) || (cur === COLS-1 && move === 0)){
+            if(straightCount > 1) weight *= 0.6;
+          }
+          
+          weights.push(weight);
+        }
+        
+        const totalWeight = weights.reduce((a,b)=>a+b, 0);
+        let rand = Math.random() * totalWeight;
+        let chosenMove = 0;
+        
+        for(let i=0; i<possibleMoves.length; i++){
+          rand -= weights[i];
+          if(rand <= 0){
+            chosenMove = possibleMoves[i];
+            break;
+          }
+        }
+        
+        if(chosenMove === 0) straightCount++;
+        else straightCount = 0;
+        
+        lastMove = chosenMove;
+        cur = clamp(cur + chosenMove, 0, COLS-1);
+      }
+      
+      render(); 
+      updatePreview();
+    }
+
+    function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+
+    document.getElementById('gen').addEventListener('click', generate);
+
+    [preferMiddle, moreTurns, balanced].forEach(el=>{
+      el.addEventListener('change', generate);
+    });
+
+    createUI(); 
+    generate();
+  })();
+  </script>
+</body>
+</html>
