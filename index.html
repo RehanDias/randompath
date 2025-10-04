@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Random Path Grid — 21x4</title>
+  <title>Dual Path Grid — 21x4</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -20,27 +20,50 @@
       transform: scale(1.05);
     }
     
-    .cell.path {
+    .cell.path1 {
       background: linear-gradient(135deg, #10b981, #06b6d4);
       box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
     }
     
-    .cell.start {
-      animation: pulse 2s infinite;
+    .cell.path2 {
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
     }
     
-    @keyframes pulse {
+    .cell.start1 {
+      animation: pulse1 2s infinite;
+    }
+    
+    .cell.start2 {
+      animation: pulse2 2s infinite;
+    }
+    
+    @keyframes pulse1 {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    }
+    
+    @keyframes pulse2 {
       0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
       50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
     }
     
-    .cell.finish {
-      animation: glow 2s infinite;
+    .cell.finish1 {
+      animation: glow1 2s infinite;
     }
     
-    @keyframes glow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-      50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+    .cell.finish2 {
+      animation: glow2 2s infinite;
+    }
+    
+    @keyframes glow1 {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7); }
+      50% { box-shadow: 0 0 0 8px rgba(6, 182, 212, 0); }
+    }
+    
+    @keyframes glow2 {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
+      50% { box-shadow: 0 0 0 8px rgba(249, 115, 22, 0); }
     }
     
     .gradient-bg {
@@ -71,9 +94,9 @@
   <div class="container mx-auto px-4 py-6">
     <div class="text-center mb-8">
       <h1 class="text-5xl font-bold text-white mb-3 tracking-tight">
-        🎲 Random Path Generator
+        🎲 Dual Path Generator
       </h1>
-      <p class="text-slate-300 text-lg">Generate jalur acak dengan aturan ketat 21×4 grid</p>
+      <p class="text-slate-300 text-lg">Generate 2 jalur independen dalam 21×4 grid</p>
     </div>
   </div>
 
@@ -89,7 +112,7 @@
           <!-- Button Generate -->
           <div class="mb-4">
             <button id="gen" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200">
-              🎲 Generate
+              🎲 Generate Dual Paths
             </button>
           </div>
           
@@ -106,6 +129,10 @@
             <label class="flex items-center gap-3 cursor-pointer group">
               <input id="balanced" type="checkbox" checked class="w-5 h-5 text-emerald-500 bg-slate-700 border-slate-600 rounded focus:ring-2 focus:ring-emerald-500 focus:ring-offset-0 cursor-pointer" />
               <span class="text-slate-200 group-hover:text-white transition-colors">Balanced distribution</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer group">
+              <input id="avoid-collision" type="checkbox" checked class="w-5 h-5 text-emerald-500 bg-slate-700 border-slate-600 rounded focus:ring-2 focus:ring-emerald-500 focus:ring-offset-0 cursor-pointer" />
+              <span class="text-slate-200 group-hover:text-white transition-colors">Avoid path collision</span>
             </label>
           </div>
         </div>
@@ -128,8 +155,8 @@
           <!-- Hint -->
           <div class="mt-4 text-sm text-slate-300 bg-slate-800/30 rounded-lg p-3">
             💡 <span class="font-medium">Tip:</span> Klik sel untuk toggle manual. 
-            <span class="text-amber-400 font-semibold">Start 🟢</span> & 
-            <span class="text-red-400 font-semibold">Finish 🏁</span> otomatis ditandai.
+            <span class="text-emerald-400 font-semibold">Path 1 (Hijau) 🟢</span> & 
+            <span class="text-amber-400 font-semibold">Path 2 (Oranye) 🟠</span>
           </div>
         </div>
         
@@ -158,9 +185,9 @@
             <div class="text-emerald-300 text-sm font-medium mb-1">Grid Size</div>
             <div class="text-white text-2xl font-bold">21 × 4</div>
           </div>
-          <div class="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-lg p-4">
-            <div class="text-purple-300 text-sm font-medium mb-1">Max Move</div>
-            <div class="text-white text-2xl font-bold">±1 Col</div>
+          <div class="bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-lg p-4">
+            <div class="text-amber-300 text-sm font-medium mb-1">Dual Paths</div>
+            <div class="text-white text-2xl font-bold">2 Routes</div>
           </div>
         </div>
       </div>
@@ -178,8 +205,10 @@
     const preferMiddle = document.getElementById('prefer-middle');
     const moreTurns = document.getElementById('more-turns');
     const balanced = document.getElementById('balanced');
+    const avoidCollision = document.getElementById('avoid-collision');
 
-    let state = new Array(ROWS).fill(0).map(()=>new Array(COLS).fill(false));
+    // State untuk 2 jalur: 0 = kosong, 1 = path1, 2 = path2
+    let state = new Array(ROWS).fill(0).map(()=>new Array(COLS).fill(0));
 
     function createUI(){
       gridEl.innerHTML = '';
@@ -196,7 +225,8 @@
           cell.dataset.r=r;
           cell.dataset.c=c;
           cell.addEventListener('click',()=>{
-            state[r][c]=!state[r][c]; 
+            // Cycle: 0 -> 1 -> 2 -> 0
+            state[r][c] = (state[r][c] + 1) % 3;
             render(); 
             updatePreview();
           });
@@ -209,36 +239,75 @@
       const cells = gridEl.querySelectorAll('.cell');
       cells.forEach(el=>{
         const r = +el.dataset.r, c = +el.dataset.c;
-        el.classList.toggle('path', !!state[r][c]);
-        el.textContent = state[r][c] ? '✅' : '';
-        el.classList.remove('start','finish');
+        const val = state[r][c];
+        
+        el.classList.remove('path1', 'path2', 'start1', 'start2', 'finish1', 'finish2');
+        el.style.outline = '';
+        
+        if(val === 1){
+          el.classList.add('path1');
+          el.textContent = '🟢';
+        } else if(val === 2){
+          el.classList.add('path2');
+          el.textContent = '🟠';
+        } else {
+          el.textContent = '';
+        }
       });
       
-      // mark start
+      // Mark start & finish untuk path 1
       for(let r=0;r<ROWS;r++){
         for(let c=0;c<COLS;c++){
-          if(state[r][c]){
+          if(state[r][c] === 1){
             const idx = r*COLS + c;
             const el = gridEl.children[idx];
-            el.classList.add('start');
-            el.style.outline = '3px solid #f59e0b';
+            el.classList.add('start1');
+            el.style.outline = '3px solid #10b981';
             el.style.outlineOffset = '2px';
-            el.textContent = '🟢';
+            el.textContent = '🚀';
             r = ROWS; break;
           }
         }
       }
       
-      // mark finish
       for(let r=ROWS-1;r>=0;r--){
         for(let c=0;c<COLS;c++){
-          if(state[r][c]){ 
+          if(state[r][c] === 1){ 
             const idx = r*COLS + c; 
             const el = gridEl.children[idx];
-            el.classList.add('finish');
-            el.style.outline = '3px solid #ef4444';
+            el.classList.add('finish1');
+            el.style.outline = '3px solid #06b6d4';
             el.style.outlineOffset = '2px';
             el.textContent = '🏁';
+            r=-1; break; 
+          }
+        }
+      }
+      
+      // Mark start & finish untuk path 2
+      for(let r=0;r<ROWS;r++){
+        for(let c=0;c<COLS;c++){
+          if(state[r][c] === 2){
+            const idx = r*COLS + c;
+            const el = gridEl.children[idx];
+            el.classList.add('start2');
+            el.style.outline = '3px solid #f59e0b';
+            el.style.outlineOffset = '2px';
+            el.textContent = '⭐';
+            r = ROWS; break;
+          }
+        }
+      }
+      
+      for(let r=ROWS-1;r>=0;r--){
+        for(let c=0;c<COLS;c++){
+          if(state[r][c] === 2){ 
+            const idx = r*COLS + c; 
+            const el = gridEl.children[idx];
+            el.classList.add('finish2');
+            el.style.outline = '3px solid #f97316';
+            el.style.outlineOffset = '2px';
+            el.textContent = '🎯';
             r=-1; break; 
           }
         }
@@ -248,86 +317,114 @@
     function updatePreview(){
       const lines = state.map((row, idx)=>{
         const rowNum = (idx+1).toString().padStart(2,'0');
-        const cells = row.map(cell=>cell? '✅' : '❌').join(' ');
+        const cells = row.map(cell => {
+          if(cell === 1) return '🟢';
+          if(cell === 2) return '🟠';
+          return '⬜';
+        }).join(' ');
         return `${rowNum}: ${cells}`;
       });
       preview.textContent = lines.join('\n');
       
       // Calculate stats
-      let totalCells = 0;
-      let turns = 0;
-      let straight = 0;
-      let lastCol = -1;
-      let colCounts = [0,0,0,0];
+      let path1Count = 0, path2Count = 0;
+      let turns1 = 0, turns2 = 0;
+      let straight1 = 0, straight2 = 0;
+      let lastCol1 = -1, lastCol2 = -1;
+      let colCounts1 = [0,0,0,0];
+      let colCounts2 = [0,0,0,0];
+      let collisions = 0;
       
       for(let r=0;r<ROWS;r++){
         for(let c=0;c<COLS;c++){
-          if(state[r][c]){
-            totalCells++;
-            colCounts[c]++;
-            if(lastCol !== -1){
-              if(c === lastCol) straight++;
-              else turns++;
+          if(state[r][c] === 1){
+            path1Count++;
+            colCounts1[c]++;
+            if(lastCol1 !== -1){
+              if(c === lastCol1) straight1++;
+              else turns1++;
             }
-            lastCol = c;
+            lastCol1 = c;
+          } else if(state[r][c] === 2){
+            path2Count++;
+            colCounts2[c]++;
+            if(lastCol2 !== -1){
+              if(c === lastCol2) straight2++;
+              else turns2++;
+            }
+            lastCol2 = c;
           }
         }
       }
       
+      // Check collisions
+      for(let r=0;r<ROWS;r++){
+        let count = 0;
+        for(let c=0;c<COLS;c++){
+          if(state[r][c] > 0) count++;
+        }
+        if(count > 1) collisions += (count - 1);
+      }
+      
       statsEl.innerHTML = `
-        <div class="flex justify-between items-center bg-slate-900/50 rounded-lg p-3">
-          <span class="text-slate-400">Total Cells:</span>
-          <span class="text-emerald-400 font-bold text-lg">${totalCells}/${ROWS}</span>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="bg-emerald-900/30 rounded-lg p-3 border border-emerald-700/30">
+            <div class="text-emerald-300 text-xs mb-1">Path 1 (Hijau)</div>
+            <div class="text-white font-bold text-lg">${path1Count}/${ROWS}</div>
+          </div>
+          <div class="bg-amber-900/30 rounded-lg p-3 border border-amber-700/30">
+            <div class="text-amber-300 text-xs mb-1">Path 2 (Oranye)</div>
+            <div class="text-white font-bold text-lg">${path2Count}/${ROWS}</div>
+          </div>
         </div>
-        <div class="flex justify-between items-center bg-slate-900/50 rounded-lg p-3">
-          <span class="text-slate-400">Turns:</span>
-          <span class="text-cyan-400 font-bold text-lg">${turns}</span>
+        
+        <div class="flex justify-between items-center bg-slate-900/50 rounded-lg p-3 mt-2">
+          <span class="text-slate-400">Collisions:</span>
+          <span class="text-${collisions > 0 ? 'red' : 'green'}-400 font-bold text-lg">${collisions}</span>
         </div>
-        <div class="flex justify-between items-center bg-slate-900/50 rounded-lg p-3">
-          <span class="text-slate-400">Straight:</span>
-          <span class="text-purple-400 font-bold text-lg">${straight}</span>
-        </div>
-        <div class="bg-slate-900/50 rounded-lg p-3">
-          <div class="text-slate-400 mb-2">Distribution:</div>
-          <div class="grid grid-cols-4 gap-2 text-center text-xs">
-            <div class="bg-slate-800 rounded py-2">
-              <div class="text-slate-500">Col 0</div>
-              <div class="text-white font-bold text-lg">${colCounts[0]}</div>
-            </div>
-            <div class="bg-slate-800 rounded py-2">
-              <div class="text-slate-500">Col 1</div>
-              <div class="text-white font-bold text-lg">${colCounts[1]}</div>
-            </div>
-            <div class="bg-slate-800 rounded py-2">
-              <div class="text-slate-500">Col 2</div>
-              <div class="text-white font-bold text-lg">${colCounts[2]}</div>
-            </div>
-            <div class="bg-slate-800 rounded py-2">
-              <div class="text-slate-500">Col 3</div>
-              <div class="text-white font-bold text-lg">${colCounts[3]}</div>
-            </div>
+        
+        <div class="grid grid-cols-2 gap-2 mt-2">
+          <div class="bg-slate-900/50 rounded-lg p-2">
+            <div class="text-emerald-400 text-xs mb-1">P1 Turns</div>
+            <div class="text-white font-bold">${turns1}</div>
+          </div>
+          <div class="bg-slate-900/50 rounded-lg p-2">
+            <div class="text-amber-400 text-xs mb-1">P2 Turns</div>
+            <div class="text-white font-bold">${turns2}</div>
           </div>
         </div>
       `;
     }
 
-    function generate(){
-      state = new Array(ROWS).fill(0).map(()=>new Array(COLS).fill(false));
-      
+    function generatePath(pathNum, existingOccupied){
       const prefer = preferMiddle.checked;
       const turns = moreTurns.checked;
       const bal = balanced.checked;
+      const avoid = avoidCollision.checked;
       
       let cur = prefer ? (Math.random()<0.5?1:2) : Math.floor(Math.random()*COLS);
       cur = clamp(cur,0,COLS-1);
       
+      let path = [];
       let lastMove = 0;
-      let zigzagCount = 0;
       let straightCount = 0;
       let colUsage = [0,0,0,0];
       
       for(let i=0; i<ROWS; i++){
-        state[i][cur] = true;
+        // Avoid collision if enabled
+        if(avoid && existingOccupied[i]?.has(cur)){
+          // Try to move to adjacent column
+          let alternatives = [];
+          if(cur > 0 && !existingOccupied[i]?.has(cur-1)) alternatives.push(cur-1);
+          if(cur < COLS-1 && !existingOccupied[i]?.has(cur+1)) alternatives.push(cur+1);
+          
+          if(alternatives.length > 0){
+            cur = alternatives[Math.floor(Math.random() * alternatives.length)];
+          }
+          // If still collision, just continue (will be marked)
+        }
+        
+        path.push({row: i, col: cur});
         colUsage[cur]++;
         
         if(i === ROWS-1) break;
@@ -345,7 +442,6 @@
           
           if(lastMove !== 0 && move !== 0 && move === -lastMove){
             weight *= 0.15;
-            zigzagCount++;
           }
           
           if(turns){
@@ -362,8 +458,9 @@
             if(colUsage[targetCol] > avgUsage * 1.5) weight *= 0.5;
           }
           
-          if((cur === 0 && move === 0) || (cur === COLS-1 && move === 0)){
-            if(straightCount > 1) weight *= 0.6;
+          // Penalize occupied cells
+          if(avoid && existingOccupied[i+1]?.has(cur + move)){
+            weight *= 0.1;
           }
           
           weights.push(weight);
@@ -388,6 +485,30 @@
         cur = clamp(cur + chosenMove, 0, COLS-1);
       }
       
+      return path;
+    }
+
+    function generate(){
+      state = new Array(ROWS).fill(0).map(()=>new Array(COLS).fill(0));
+      
+      // Generate path 1
+      const path1 = generatePath(1, {});
+      const occupied = {};
+      for(let cell of path1){
+        state[cell.row][cell.col] = 1;
+        if(!occupied[cell.row]) occupied[cell.row] = new Set();
+        occupied[cell.row].add(cell.col);
+      }
+      
+      // Generate path 2
+      const path2 = generatePath(2, occupied);
+      for(let cell of path2){
+        // If collision, mark both (will show in stats)
+        if(state[cell.row][cell.col] === 0){
+          state[cell.row][cell.col] = 2;
+        }
+      }
+      
       render(); 
       updatePreview();
     }
@@ -396,7 +517,7 @@
 
     document.getElementById('gen').addEventListener('click', generate);
 
-    [preferMiddle, moreTurns, balanced].forEach(el=>{
+    [preferMiddle, moreTurns, balanced, avoidCollision].forEach(el=>{
       el.addEventListener('change', generate);
     });
 
